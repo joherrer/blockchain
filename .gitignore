@@ -1,0 +1,25 @@
+# Ignore compiled Python files
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Ignore Python virtual environment
+venv/
+
+# Ignore environment variables
+.env
+
+# Ignore Database Files
+*.db
+
+# Ignore macOS Finder metadata
+.DS_Store
+
+# Ignore other IDE-specific files
+.idea/
+.vscode/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.bak
