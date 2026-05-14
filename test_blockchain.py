@@ -71,13 +71,14 @@ def test_blockchain_add_block():
     blockchain = Blockchain()
 
     # Test adding a block without data
-    with pytest.raises(ValueError, match="Missing data"):
-        blockchain.add_block(None)
-        blockchain.add_block("")
-        blockchain.add_block([])
-        blockchain.add_block({})
-        blockchain.add_block(0)
-        blockchain.add_block(False)
+    for missing_data in (None, "", [], {}, 0, False):
+        with pytest.raises(ValueError, match="Missing data"):
+            blockchain.add_block(missing_data)
+
+    # Test adding non-string data
+    for invalid_data in (["transaction"], {"transaction": 1}, 100, True):
+        with pytest.raises(TypeError, match="Block data must be a string"):
+            blockchain.add_block(invalid_data)
 
     # Add block with valid data
     data = "First transaction"
@@ -86,3 +87,28 @@ def test_blockchain_add_block():
     # Test block was added
     assert len(blockchain.chain) == 2
     assert blockchain.chain[-1].data == data
+
+
+def test_blockchain_add_block_links_to_previous_block():
+    '''Test add_block() links new blocks to the current latest block'''
+    blockchain = Blockchain()
+    previous_block = blockchain.get_latest_block()
+
+    blockchain.add_block("First transaction")
+    new_block = blockchain.get_latest_block()
+
+    assert new_block.index == 1
+    assert new_block.previous_hash == previous_block.hash
+
+
+def test_blockchain_is_chain_valid():
+    '''Test is_chain_valid() detects valid and tampered chains'''
+    blockchain = Blockchain()
+    blockchain.add_block("First transaction")
+    blockchain.add_block("Second transaction")
+
+    assert blockchain.is_chain_valid() is True
+
+    blockchain._chain[1]._data = "Altered transaction"
+
+    assert blockchain.is_chain_valid() is False

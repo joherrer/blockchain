@@ -73,6 +73,8 @@ class Blockchain:
     def add_block(self, data):
         if not data:
             raise ValueError("Missing data")
+        if not isinstance(data, str):
+            raise TypeError("Block data must be a string")
         previous_block = self.get_latest_block()
         new_block = Block(len(self._chain), int(time.time()), data, previous_block.hash)
         self._chain.append(new_block)
